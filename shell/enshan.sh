@@ -16,7 +16,7 @@ fi
 echo "配置文件存在，继续执行..."
 
 # 检查 jq 是否安装
-if ! type jq &> /dev/null; then
+if ! command -v jq >/dev/null 2>&1; then
     echo "检查 jq 是否安装..."
     echo "jq 未安装，请先安装 jq！"
     exit 1
@@ -25,7 +25,7 @@ fi
 echo "jq 已安装，继续执行..."
 
 # 检查 curl 是否安装
-if ! type curl &> /dev/null; then
+if ! command -v curl >/dev/null 2>&1; then
     echo "检查 curl 是否安装..."
     echo "curl 未安装，请先安装 curl！"
     exit 1
