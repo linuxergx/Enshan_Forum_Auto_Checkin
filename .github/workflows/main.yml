@@ -22,6 +22,8 @@ jobs:
           # 从 GitHub Secrets 映射到环境变量
           ENSHAN_COOKIE: ${{ secrets.ENSHAN_COOKIE }}
           BARK_URL: ${{ secrets.BARK_URL }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_USERID: ${{ secrets.TELEGRAM_USERID }}
         run: |
           chmod +x ./shell/enshan.sh
           ./shell/enshan.sh
