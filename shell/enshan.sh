@@ -20,6 +20,15 @@ check_env() {
         exit 1
     fi
 
+# 核心诊断打印 (脱敏处理，只看头尾)
+if [ -n "$ENSHAN_COOKIE" ]; then
+    COOKIE_LEN=${#ENSHAN_COOKIE}
+    echo "DEBUG: Cookie 获取成功! 长度: $COOKIE_LEN"
+    echo "DEBUG: Cookie 片段: ${ENSHAN_COOKIE:0:20}...${ENSHAN_COOKIE: -20}"
+else
+    echo "❌ 错误: 所有途径均未获取到 Cookie！"
+fi
+
     if [ -z "$ENSHAN_COOKIE" ]; then
         echo "❌ 错误: 未获取到 ENSHAN_COOKIE，请检查环境变量或 config.json。"
         exit 1
