@@ -1,65 +1,98 @@
-# EnShan 论坛签到 Shell 脚本
+# EnShan 论坛自动签到 Shell 脚本 (路由器/本地版)
 
-## 介绍
-这是一个用于自动签到恩山无线论坛（EnShan Forum）的 Shell 脚本，专为资源受限的设备（如路由器）设计。它通过模拟 HTTP 请求完成签到，并将结果通过 Bark 推送通知。
+## 📌 介绍
 
-## 功能
+这是一个专为 **路由器**（如 OpenWrt, Padavan, 等）及 **NAS/虚拟机** 环境设计的恩山无线论坛自动签到脚本。
+
+⚠️ **重要警告**： 经过实测，恩山论坛使用了高强度的 WAF 防火墙（经常会触发 521 拦截），**GitHub Actions 等云端环境 IP 已被彻底封锁**。目前该脚本 **仅推荐在家庭宽带环境（本地设备）运行**，以利用家宽 IP 的高信誉度绕过拦截。
+
+## 🕊功能
+
 - 自动签到恩山无线论坛。
 - 提取并显示“恩山币”和“积分”。
-- 通过 Bark 推送通知签到结果。
+- 可通过 Bark或TG 推送通知签到结果。
 
-## 环境要求
-- **BusyBox**：支持 `grep`、`sed`、`curl` 和 `jq`。
-- **网络连接**：能够访问恩山论坛和 Bark 服务。
-- **Cookie**：有效的恩山论坛登录 Cookie。
-- **Bark URL**：用于推送通知的 Bark 服务 URL。
+## ✨ 特点
 
-## 安装
-1. **安装必要的工具**：
-   - 确保你的设备上安装了 `curl` 和 `jq`。如果未安装，可以通过以下命令安装（具体命令取决于你的系统）：
-     ```bash
-     opkg install curl jq  # OpenWRT 系统
-     # 本人使用的路由器为二手拆emmc芯片，刷了Padavan固件的鲁班jdc-1,有opkg命令但切换root之后还是报权限问题
-     ```
+- **环境自适应**：支持 BusyBox/精简版 Linux 环境，完美兼容 `curl` 和 `jq`。
+- **随机化抗风控**：在`config.json`中内置 User-Agent 随机切换逻辑，模拟真实设备访问。
+- **多平台通知**：支持 Bark 和 Telegram Bot 签到结果推送。
 
-2. **准备配置文件**：
-   - 创建 `config.json` 文件，并填写你的恩山论坛 Cookie 和 Bark URL：
-     ```json
-     {
-         "ENSHAN": [
-             {
-                 "cookie": "your_enshan_cookie_here"
-             }
-         ],
-         "BARK_URL": "https://api.day.app/your_bark_key/"
-     }
-     ```
+## 🛠️ 环境要求
 
-3. **下载脚本**：
-   - 将脚本文件 `sign_enshan.sh` 放在与 `config.json` 同一目录下。
+- **核心依赖**：`curl` 和 `jq`（必须）。
+- **网络条件**：家庭宽带环境（家宽 IP 权重高，签到成功率接近 100%）。
+- **存储空间**：极小，专为资源受限设备优化。
 
-## 使用方法
-1. **赋予脚本执行权限**：
-   ```bash
-   chmod +x sign_enshan.sh
+## 📥 安装与配置
+
+### 1. 安装依赖
+
+在 OpenWrt 或其他支持 `opkg` 的系统下执行：
+
+```
+opkg update
+opkg install curl jq
+```
+
+
+
+### 2. 准备配置文件 `config.json`
+
+在脚本同级目录下创建 `config.json`：
+
+```
+{
+  "BARK_URL": "",
+  "TELEGRAM_TOKEN":  "",
+  "TELEGRAM_USERID": "",
+  "ENSHAN": [
+    {
+    "cookie": ""
+    }
+  ],
+  "USER_AGENTS": [
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15"
+      ]
+}
+```
+
+### 3. 如何抓取 Cookie
+
+1. 使用电脑浏览器（推荐 Chrome）登录恩山论坛。
+2. 按 `F12` 进入开发者工具 -> **Network (网络)**。
+3. 刷新页面，点击任意请求，在 **Request Headers** 中复制 `cookie:` 后的全部字符串。
+
+## 🚀 使用方法
+
+1. **赋予执行权限**：
+
+   ```
+   chmod +x enshan.sh
    ```
 
-2. **运行脚本**：
-   ```bash
-   ./sign_enshan.sh
+2. **手动运行测试**：
+
+   ```
+   ./enshan.sh
    ```
 
-3. **定时任务（可选）**：
-   - 如果你希望每天自动签到，可以将脚本添加到定时任务中。例如，在 `cron` 中添加以下任务：
-     ```bash
-     0 8 * * * /path/to/sign_enshan.sh
-     ```
-     这将在每天早上 8 点执行签到脚本。
+3. **设置定时任务 (Crontab)**： 建议避开整点运行（例如设置为 08:35）：
 
-## 注意事项
-- **Cookie 有效期**：确保你的恩山论坛 Cookie 是有效的。如果 Cookie 失效，需要更新 `config.json` 文件。
-- **网络连接**：确保你的设备可以访问恩山论坛和 Bark 服务。
-- **资源限制**：本脚本专为资源受限的设备设计，尽量减少了对系统资源的占用。
+   ```
+   35 8 * * * /path/to/enshan.sh >> /tmp/enshan.log 2>&1
+   ```
 
-## 贡献
-如果你有任何改进建议或遇到问题，欢迎提交 Issue 或 Pull Request。
+## ⚠️ 注意事项
+
+- **WAF 拦截 (HTTP 521)**：如果脚本提示 521 错误，说明该环境 IP 被封锁，请尝试更换运行设备或重启路由器获取新 IP。
+- **Cookie 时效**：若提示解析失败且标题为“提示信息”，请重新抓取 Cookie 并更新 `config.json`。
+- **安全提醒**：请勿将包含敏感 Cookie 的 `config.json` 上传至任何公开仓库。
+
+## 🤝 贡献
+
+如有改进建议或代码优化，欢迎提交 Issue。
+
+
+
