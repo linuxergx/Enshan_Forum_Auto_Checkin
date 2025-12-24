@@ -2,10 +2,11 @@
 
 # 配置文件路径
 CONFIG_FILE="config.json"
-ENSHAN_COOKIE=${ENSHAN_COOKIE:-$(jq -r '.ENSHAN[0].cookie' "$CONFIG_FILE" 2>/dev/null)}
-BARK_URL=${BARK_URL:-$(jq -r '.BARK_URL' "$CONFIG_FILE" 2>/dev/null)}
-TELEGRAM_TOKEN=${TELEGRAM_TOKEN:-$(jq -r '.TELEGRAM_TOKEN' "$CONFIG_FILE" 2>/dev/null)}
-TELEGRAM_USERID=${TELEGRAM_USERID:-$(jq -r '.TELEGRAM_USERID' "$CONFIG_FILE" 2>/dev/null)}
+# 逻辑：如果环境变量已经有值（GitHub 注入），就直接用；否则才去执行 jq 读取 JSON
+[ -z "$ENSHAN_COOKIE" ] && ENSHAN_COOKIE=$(jq -r '.ENSHAN[0].cookie' "$CONFIG_FILE" 2>/dev/null)
+[ -z "$BARK_URL" ] && BARK_URL=$(jq -r '.BARK_URL' "$CONFIG_FILE" 2>/dev/null)
+[ -z "$TELEGRAM_TOKEN" ] && TELEGRAM_TOKEN=$(jq -r '.TELEGRAM_TOKEN' "$CONFIG_FILE" 2>/dev/null)
+[ -z "$TELEGRAM_USERID" ] && TELEGRAM_USERID=$(jq -r '.TELEGRAM_USERID' "$CONFIG_FILE" 2>/dev/null)
 # 检查配置文件是否存在
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "检查配置文件是否存在..."
