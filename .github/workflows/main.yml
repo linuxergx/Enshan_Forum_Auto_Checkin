@@ -23,5 +23,5 @@ jobs:
           ENSHAN_COOKIE: ${{ secrets.ENSHAN_COOKIE }}
           BARK_URL: ${{ secrets.BARK_URL }}
         run: |
-          chmod +x enshan.sh
-          ./enshan.sh
+          chmod +x ./shell/enshan.sh
+          ./shell/enshan.sh
