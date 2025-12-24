@@ -48,11 +48,17 @@ sign_enshan() {
     local compress_opt=""
     curl --help all | grep -q "\--compressed" && compress_opt="--compressed"
 
-    local response=$(curl -s -L $compress_opt --request GET 'https://www.right.com.cn/forum/home.php?mod=spacecp&ac=credit&showcredit=1' \
+    # 增加 -w 参数来打印 HTTP 状态码，增加 -v 打印详细过程
+    echo "DEBUG: 正在发起网络请求..."
+    local response=$(curl -s -v -L $compress_opt --request GET 'https://www.right.com.cn/forum/home.php?mod=spacecp&ac=credit&showcredit=1' \
         -H "User-Agent: $current_ua" \
         -H "Cookie: $ENSHAN_COOKIE" \
         -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
-        -H 'Referer: https://www.right.com.cn/forum/forum.php?mod=guide&view=my')
+        -H 'Referer: https://www.right.com.cn/forum/forum.php?mod=guide&view=my' \
+        -w "\nHTTP_CODE: %{http_code}\n")
+
+    # 打印状态码看看
+    echo "DEBUG: 最终 HTTP 状态码: $(echo "$response" | grep 'HTTP_CODE' | awk '{print $2}')"
 
     # 提取关键信息
     local coin=$(echo "$response" | grep -oE '恩山币: </em>[^<]+' | grep -oE '[0-9]+' | head -n 1)
