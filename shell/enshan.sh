@@ -97,7 +97,16 @@ push_bark() {
         echo "通知发送失败，请检查 Bark URL 和网络连接！"
     fi
 }
-
+# TG 推送函数
+push_tg() {
+    local message="$1"
+    echo "推送通知到 Telegram..."
+    # 这里的变量名要和 .yml 里的 env 对应
+    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+         -d chat_id="${TELEGRAM_USERID}" \
+         -d parse_mode=HTML \
+         -d text="$message"
+}
 # 主逻辑
 main() {
     sign_result=$(sign_enshan)
@@ -106,9 +115,11 @@ main() {
     if [ $sign_status -eq 0 ]; then
         echo "$sign_result"
         push_bark "$sign_result"
+        push_tg "$sign_result"
     else
         echo "$sign_result"
         push_bark "$sign_result"
+        push_tg "$sign_result"
     fi
 }
 
