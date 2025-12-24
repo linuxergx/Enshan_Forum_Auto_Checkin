@@ -2,13 +2,16 @@
 
 # 配置文件路径
 CONFIG_FILE="config.json"
-
+ENSHAN_COOKIE=${ENSHAN_COOKIE:-$(jq -r '.ENSHAN[0].cookie' "$CONFIG_FILE" 2>/dev/null)}
+BARK_URL=${BARK_URL:-$(jq -r '.BARK_URL' "$CONFIG_FILE" 2>/dev/null)}
+TELEGRAM_TOKEN=${TELEGRAM_TOKEN:-$(jq -r '.TELEGRAM_TOKEN' "$CONFIG_FILE" 2>/dev/null)}
+TELEGRAM_USERID=${TELEGRAM_USERID:-$(jq -r '.TELEGRAM_USERID' "$CONFIG_FILE" 2>/dev/null)}
 # 检查配置文件是否存在
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "检查配置文件是否存在..."
-    echo "配置文件 $CONFIG_FILE 不存在！"
-    exit 1
+    echo "配置文件 $CONFIG_FILE 不存在！尝试从环境变量读取.."
 fi
+
 
 echo "配置文件存在，继续执行..."
 
