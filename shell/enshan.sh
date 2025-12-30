@@ -42,7 +42,7 @@ sign_enshan() {
     echo "🚀 正在签到... 使用UA片段: ${current_ua:0:40}..."
 
     # 删掉了 --compressed，确保老版本 curl 也能跑
-    local response=$(curl -s -L --request GET 'https://www.right.com.cn/forum/home.php?mod=spacecp&ac=credit&showcredit=1' \
+    local response=$(curl -s -L --request GET 'https://www.right.com.cn/forum/home.php?mod=spacecp&ac=credit&op=base' \
         -H "User-Agent: $current_ua" \
         -H "Cookie: $ENSHAN_COOKIE" \
         -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
